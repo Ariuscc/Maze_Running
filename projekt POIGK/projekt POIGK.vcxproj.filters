@@ -32,6 +32,12 @@
     <Image Include="container.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="adachi.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="box.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\graopengl\OpenGL\includes\stb_image.h">
