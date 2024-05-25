@@ -27,9 +27,13 @@
     <Image Include="adachi.jpg" />
     <Image Include="awesomeface.png" />
     <Image Include="box.jpg" />
+    <Image Include="circle.png" />
     <Image Include="container.jpg" />
+    <Image Include="x.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\graopengl\OpenGL\includes\glm\glm.hpp" />
+    <ClInclude Include="..\..\..\graopengl\OpenGL\includes\learnopengl\camera.h" />
     <ClInclude Include="..\..\..\graopengl\OpenGL\includes\learnopengl\shader_s.h" />
     <ClInclude Include="..\..\..\graopengl\OpenGL\includes\stb_image.h" />
   </ItemGroup>
@@ -38,6 +42,12 @@
     <None Include="3.3.shader.vs" />
     <None Include="4.2.texture.fs" />
     <None Include="4.2.texture.vs" />
+    <None Include="5.1.transform.fs" />
+    <None Include="5.1.transform.vs" />
+    <None Include="6.3.coordinate_systems.fs" />
+    <None Include="6.3.coordinate_systems.vs" />
+    <None Include="7.4.camera.fs" />
+    <None Include="7.4.camera.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
