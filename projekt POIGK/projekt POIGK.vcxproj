@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\graopengl\OpenGL\glad.c" />
+    <ClCompile Include="D:\PROGRAMOWANIE\biblio\graopengl\OpenGL\glad.c" />
     <ClCompile Include="FileName.cpp" />
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
@@ -102,8 +102,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\graopengl\OpenGL\includes;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\graopengl\OpenGL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\PROGRAMOWANIE\biblio\graopengl\OpenGL\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\PROGRAMOWANIE\biblio\graopengl\OpenGL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,6 +144,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;kernel32.lib;gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"D:\PROGRAMOWANIE\biblio\graopengl\OpenGL"</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -18,10 +18,10 @@
     <ClCompile Include="FileName.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graopengl\OpenGL\glad.c">
+    <ClCompile Include="stb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stb.cpp">
+    <ClCompile Include="D:\PROGRAMOWANIE\biblio\graopengl\OpenGL\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
