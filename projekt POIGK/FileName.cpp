@@ -21,7 +21,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(3.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -30,7 +30,43 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+int lastmove = 0;
+
 bool Wall[50][50];
+
+bool CheckCollision(Camera& one, glm::vec3& two) {
+	bool collisionX = one.Position.x + 0.5f >= two.x &&
+		two.x + 0.5f >= one.Position.x;
+	// collision y-axis?
+	bool collisionZ = one.Position.z + 0.5f >= two.z &&
+		two.z + 0.5f >= one.Position.z;
+	// collision only if on both axes
+	return collisionX && collisionZ;
+}
+
+glm::vec3 walls[] = {
+	glm::vec3(0.0f,  1.0f,  0.0f),
+	glm::vec3(1.0f,  1.0f,  0.0f),
+	glm::vec3(2.0f,  1.0f,  0.0f),
+	glm::vec3(3.0f,  1.0f,  0.0f),
+	glm::vec3(4.0f,  1.0f,  0.0f),
+	glm::vec3(5.0f,  1.0f,  0.0f),
+	glm::vec3(6.0f,  1.0f,  0.0f),
+	glm::vec3(7.0f,  1.0f,  0.0f),
+	glm::vec3(8.0f,  1.0f,  0.0f),
+	glm::vec3(9.0f,  1.0f,  0.0f),
+	glm::vec3(10.0f,  1.0f,  0.0f),
+	glm::vec3(11.0f,  1.0f,  0.0f),
+	glm::vec3(12.0f,  1.0f,  0.0f),
+	glm::vec3(13.0f,  1.0f,  0.0f),
+	glm::vec3(14.0f,  1.0f,  0.0f),
+	glm::vec3(15.0f,  1.0f,  0.0f),
+	glm::vec3(16.0f,  1.0f,  0.0f),
+	glm::vec3(17.0f,  1.0f,  0.0f),
+	glm::vec3(18.0f,  1.0f,  0.0f),
+	glm::vec3(19.0f,  1.0f,  0.0f),
+	glm::vec3(20.0f,  1.0f,  0.0f),
+};
 
 int main()
 {
@@ -125,7 +161,7 @@ int main()
 	};
 	// world space positions of our cubes
 	glm::vec3 cubePositions[] = {
-		glm::vec3(-1.0f,  -0.5f,  0.0f),
+		glm::vec3(0.0f,  -0.5f,  0.0f),
 	};
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -259,22 +295,21 @@ int main()
 
 		for (unsigned int i = 0; i < 20; i++) {
 			for (unsigned int j = 0; j < 20; j++)
-
 			{
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, cubePositions[0]);
 				float angle = 0.0f * i;
 				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 				model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
-				if (j == 0 or j == 19 or i==0 or i==19) {
+				if (j == 0 or j == 19 or i == 0 or i == 19) {
 					model = glm::translate(model, glm::vec3(j * 1.0f, 1.0f, i * 1.0f));
-					Wall[i][j] = true;
 				}
 				ourShader.setMat4("model", model);
 
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
 		}
+
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
@@ -298,15 +333,69 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	bool move = true;
+	glm::vec3 check = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+	for (unsigned int i = 0; i < 20; i++) {
+		for (unsigned int j = 0; j < 20; j++)
+		{
+			if (j == 0 or j == 19 or i == 0 or i == 19) {
+				check = glm::vec3(j * 0.5f, 0.0f, i * 0.5f);
+				if (CheckCollision(camera, check) == true) move = false;
+			}
+		}
+	}
+	if (move == true) {
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			camera.ProcessKeyboard(FORWARD, deltaTime);
+			lastmove = 0;
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
+			lastmove = 1;
+		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			camera.ProcessKeyboard(LEFT, deltaTime);
+			lastmove = 2;
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			camera.ProcessKeyboard(RIGHT, deltaTime);
+			lastmove = 3;
+		}
+	}
+	else if (move == false) {
+		move = true;
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			if (lastmove == 0)
+				camera.ProcessKeyboard(BACKWARD, deltaTime);
+			else camera.ProcessKeyboard(FORWARD, deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			if (lastmove == 1)
+				camera.ProcessKeyboard(FORWARD, deltaTime);
+			else camera.ProcessKeyboard(BACKWARD, deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			if (lastmove == 2)
+				camera.ProcessKeyboard(RIGHT, deltaTime);
+			else camera.ProcessKeyboard(LEFT, deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			if (lastmove == 3)
+				camera.ProcessKeyboard(LEFT, deltaTime);
+			else camera.ProcessKeyboard(RIGHT, deltaTime);
+		}
+	}
+
+
 
 }
 
