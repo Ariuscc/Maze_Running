@@ -10,6 +10,7 @@
 #include <learnopengl/camera.h>
 
 #include <iostream>
+#include <vector>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -21,7 +22,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(3.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.5f, 0.0f, 0.5f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -30,13 +31,15 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+int Walls[21][21];
+
 
 bool CheckCollision(Camera& one, glm::vec3& two) {
-	bool collisionX = one.Position.x + 0.55f >= two.x &&
-		two.x + 0.55f >= one.Position.x;
+	bool collisionX = one.Position.x + 0.4f >= two.x &&
+		two.x + 0.4f >= one.Position.x;
 	// collision y-axis?
-	bool collisionZ = one.Position.z + 0.55f >= two.z &&
-		two.z + 0.55f >= one.Position.z;
+	bool collisionZ = one.Position.z + 0.4f >= two.z &&
+		two.z + 0.4f >= one.Position.z;
 	// collision only if on both axes
 	return collisionX && collisionZ;
 }
@@ -52,6 +55,35 @@ int checkdirection(Camera& one, glm::vec3& two) {
 	else if (abs(xdiff) > abs(zdiff) && xdiff < 0) dir = 4;
 	
 	return dir;
+}
+
+void Loadlvl(const char* file, unsigned int levelWidth, unsigned int levelHeight)
+{
+	// load from file
+	unsigned int tileCode;
+	std::string line;
+	std::ifstream fstream(file);
+	std::vector<std::vector<unsigned int>> tileData;
+	if (fstream)
+	{
+		while (std::getline(fstream, line)) // read each line from level file
+		{
+			std::istringstream sstream(line);
+			std::vector<unsigned int> row;
+			while (sstream >> tileCode) // read each word separated by spaces
+				row.push_back(tileCode);
+			tileData.push_back(row);
+		}
+	}
+	for (unsigned int y = 0; y < 21; ++y)
+	{
+		for (unsigned int x = 0; x < 21; ++x)
+		{
+			if (tileData[y][x] == 1) Walls[y][x] = 1;
+			else Walls[y][x] = 0;
+		}
+		std::cout << "" << std::endl;
+	}
 }
 
 glm::vec3 walls[] = {
@@ -126,6 +158,9 @@ int main()
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
+
+	Loadlvl("level1.txt", 21, 21);
+
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -303,15 +338,15 @@ int main()
 			}
 		}
 
-		for (unsigned int i = 0; i < 20; i++) {
-			for (unsigned int j = 0; j < 20; j++)
+		for (unsigned int i = 0; i < 21; i++) {
+			for (unsigned int j = 0; j < 21; j++)
 			{
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, cubePositions[0]);
 				float angle = 0.0f * i;
 				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 				model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
-				if (j == 0 or j == 19 or i == 0 or i == 19) {
+				if (Walls[i][j] == 1) {
 					model = glm::translate(model, glm::vec3(j * 1.0f, 1.0f, i * 1.0f));
 				}
 				ourShader.setMat4("model", model);
@@ -347,17 +382,17 @@ void processInput(GLFWwindow* window)
 	glm::vec3 check = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 collided = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	for (unsigned int i = 0; i < 20; i++) {
-		for (unsigned int j = 0; j < 20; j++)
+	for (unsigned int i = 0; i < 21; i++) {
+		for (unsigned int j = 0; j < 21; j++)
 		{
-			if (j == 0 or j == 19 or i == 0 or i == 19) {
+			if (Walls[i][j] == 1) {
 				check = glm::vec3(j * 0.5f, 0.0f, i * 0.5f);
 				if (CheckCollision(camera, check) == true)
 				{
 					move = false;
 					collided = check;
-					i = 20;
-					j = 20;
+					i = 21;
+					j = 21;
 				}
 			}
 		}
