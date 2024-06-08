@@ -30,18 +30,28 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-int lastmove = 0;
-
-bool Wall[50][50];
 
 bool CheckCollision(Camera& one, glm::vec3& two) {
-	bool collisionX = one.Position.x + 0.5f >= two.x &&
-		two.x + 0.5f >= one.Position.x;
+	bool collisionX = one.Position.x + 0.55f >= two.x &&
+		two.x + 0.55f >= one.Position.x;
 	// collision y-axis?
-	bool collisionZ = one.Position.z + 0.5f >= two.z &&
-		two.z + 0.5f >= one.Position.z;
+	bool collisionZ = one.Position.z + 0.55f >= two.z &&
+		two.z + 0.55f >= one.Position.z;
 	// collision only if on both axes
 	return collisionX && collisionZ;
+}
+
+int checkdirection(Camera& one, glm::vec3& two) {
+	float xdiff = one.Position.x - two.x;
+	float zdiff = one.Position.z - two.z;
+	int dir = 0;
+
+	if (abs(xdiff) < abs(zdiff) && zdiff > 0) dir = 1;
+	else if (abs(xdiff) < abs(zdiff) && zdiff < 0) dir = 2;
+	else if (abs(xdiff) > abs(zdiff) && xdiff > 0) dir = 3;
+	else if (abs(xdiff) > abs(zdiff) && xdiff < 0) dir = 4;
+	
+	return dir;
 }
 
 glm::vec3 walls[] = {
@@ -335,64 +345,40 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 	bool move = true;
 	glm::vec3 check = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 collided = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	for (unsigned int i = 0; i < 20; i++) {
 		for (unsigned int j = 0; j < 20; j++)
 		{
 			if (j == 0 or j == 19 or i == 0 or i == 19) {
 				check = glm::vec3(j * 0.5f, 0.0f, i * 0.5f);
-				if (CheckCollision(camera, check) == true) move = false;
+				if (CheckCollision(camera, check) == true)
+				{
+					move = false;
+					collided = check;
+					i = 20;
+					j = 20;
+				}
 			}
 		}
 	}
 	if (move == true) {
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			camera.ProcessKeyboard(FORWARD, deltaTime);
-			lastmove = 0;
-		}
+			camera.ProcessKeyboard(FORWARD, 0.1 * deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			camera.ProcessKeyboard(BACKWARD, deltaTime);
-			lastmove = 1;
-		}
+			camera.ProcessKeyboard(BACKWARD, 0.1 * deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			camera.ProcessKeyboard(LEFT, deltaTime);
-			lastmove = 2;
-		}
+			camera.ProcessKeyboard(LEFT, 0.1 * deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			camera.ProcessKeyboard(RIGHT, deltaTime);
-			lastmove = 3;
-		}
+			camera.ProcessKeyboard(RIGHT, 0.1 * deltaTime);
 	}
 	else if (move == false) {
-		move = true;
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			if (lastmove == 0)
-				camera.ProcessKeyboard(BACKWARD, deltaTime);
-			else camera.ProcessKeyboard(FORWARD, deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			if (lastmove == 1)
-				camera.ProcessKeyboard(FORWARD, deltaTime);
-			else camera.ProcessKeyboard(BACKWARD, deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			if (lastmove == 2)
-				camera.ProcessKeyboard(RIGHT, deltaTime);
-			else camera.ProcessKeyboard(LEFT, deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			if (lastmove == 3)
-				camera.ProcessKeyboard(LEFT, deltaTime);
-			else camera.ProcessKeyboard(RIGHT, deltaTime);
-		}
+		int dir = checkdirection(camera, collided);
+		if (dir == 1) camera.Position.z = camera.Position.z + 0.005f;
+		if (dir == 2) camera.Position.z = camera.Position.z - 0.005f;
+		if (dir == 3) camera.Position.x = camera.Position.x + 0.005f;
+		if (dir == 4) camera.Position.x = camera.Position.x - 0.005f;
+
 	}
 
 
