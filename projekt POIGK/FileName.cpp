@@ -22,7 +22,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(0.5f, 0.0f, 0.5f));
+Camera camera(glm::vec3(9.5f, 0.0f, 0.5f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -32,6 +32,8 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 int Walls[21][21];
+
+bool playing = true;
 
 
 bool CheckCollision(Camera& one, glm::vec3& two) {
@@ -53,7 +55,7 @@ int checkdirection(Camera& one, glm::vec3& two) {
 	else if (abs(xdiff) < abs(zdiff) && zdiff < 0) dir = 2;
 	else if (abs(xdiff) > abs(zdiff) && xdiff > 0) dir = 3;
 	else if (abs(xdiff) > abs(zdiff) && xdiff < 0) dir = 4;
-	
+
 	return dir;
 }
 
@@ -80,7 +82,8 @@ void Loadlvl(const char* file, unsigned int levelWidth, unsigned int levelHeight
 		for (unsigned int x = 0; x < 21; ++x)
 		{
 			if (tileData[y][x] == 1) Walls[y][x] = 1;
-			else Walls[y][x] = 0;
+			else if (tileData[y][x] == 0) Walls[y][x] = 0;
+			else if (tileData[y][x] == 2) Walls[y][x] = 2;
 		}
 		std::cout << "" << std::endl;
 	}
@@ -285,7 +288,7 @@ int main()
 
 	// render loop
 	// -----------
-	while (!glfwWindowShouldClose(window))
+	while (playing == true && !glfwWindowShouldClose(window))
 	{
 		// per-frame time logic
 		// --------------------
@@ -321,8 +324,8 @@ int main()
 
 		// render boxes
 		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 20; i++) {
-			for (unsigned int j = 0; j < 20; j++)
+		for (unsigned int i = 0; i < 21; i++) {
+			for (unsigned int j = 0; j < 21; j++)
 
 			{
 				// calculate the model matrix for each object and pass it to shader before drawing
@@ -391,8 +394,15 @@ void processInput(GLFWwindow* window)
 				{
 					move = false;
 					collided = check;
-					i = 21;
-					j = 21;
+					i = 20;
+					j = 20;
+				}
+			}
+			if (Walls[i][j] == 2) {
+				check = glm::vec3(j * 0.5f, 0.0f, i * 0.5f);
+				if (CheckCollision(camera, check) == true)
+				{
+					playing = false;
 				}
 			}
 		}
